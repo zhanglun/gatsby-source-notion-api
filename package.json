@@ -32,7 +32,9 @@
 		"url": "git+ssh://git@github.com/orlowdev/gatsby-source-notion-api.git"
 	},
 	"dependencies": {
+		"@notionhq/client": "^1.0.4",
 		"node-fetch": "^2.6.1",
+		"notion-to-md": "^2.3.2",
 		"or-pipets": "^1.0.1",
 		"yaml": "^1.10.2"
 	},

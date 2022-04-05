@@ -1,8 +1,10 @@
+const { Client } = require("@notionhq/client")
+const { NotionToMarkdown } = require("notion-to-md")
+const YAML = require("yaml")
 const { getPages } = require("./src/notion-api/get-pages")
-const { notionBlockToMarkdown } = require("./src/transformers/notion-block-to-markdown")
 const { getNotionPageProperties } = require("./src/transformers/get-page-properties")
 const { getNotionPageTitle } = require("./src/transformers/get-page-title")
-const YAML = require("yaml")
+const { getPageMarkdown } = require("./src/transformers/get-page-markdown")
 
 const NOTION_NODE_TYPE = "Notion"
 
@@ -10,12 +12,17 @@ exports.sourceNodes = async (
 	{ actions, createContentDigest, createNodeId, reporter },
 	{ token, databaseId, propsToFrontmatter = true, lowerTitleLevel = true },
 ) => {
+	const notion = new Client({
+		auth: token,
+	})
+	const n2m = new NotionToMarkdown({ notionClient: notion })
+
 	const pages = await getPages({ token, databaseId }, reporter)
 
-	pages.forEach((page) => {
+	pages.forEach(async (page) => {
 		const title = getNotionPageTitle(page)
 		const properties = getNotionPageProperties(page)
-		let markdown = notionBlockToMarkdown(page, lowerTitleLevel)
+		let markdown = await getPageMarkdown(n2m, page)
 
 		if (propsToFrontmatter) {
 			const frontmatter = Object.keys(properties).reduce(
