@@ -5,6 +5,7 @@ const { getPages } = require("./src/notion-api/get-pages")
 const { getNotionPageProperties } = require("./src/transformers/get-page-properties")
 const { getNotionPageTitle } = require("./src/transformers/get-page-title")
 const { getPageMarkdown } = require("./src/transformers/get-page-markdown")
+const { getNotionPageCover } = require("./src/transformers/get-page-cover")
 
 const NOTION_NODE_TYPE = "Notion"
 
@@ -22,6 +23,7 @@ exports.sourceNodes = async (
 	pages.forEach(async (page) => {
 		const title = getNotionPageTitle(page)
 		const properties = getNotionPageProperties(page)
+		const cover = getNotionPageCover(page)
 		let markdown = await getPageMarkdown(n2m, page)
 
 		if (propsToFrontmatter) {
@@ -39,6 +41,7 @@ exports.sourceNodes = async (
 		actions.createNode({
 			id: createNodeId(`${NOTION_NODE_TYPE}-${page.id}`),
 			title,
+			cover,
 			properties,
 			archived: page.archived,
 			createdAt: page.created_time,
