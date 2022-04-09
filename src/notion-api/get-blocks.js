@@ -3,7 +3,6 @@ const { errorMessage } = require("../error-message")
 exports.getBlocks = async (notionClient, blockId, reporter) => {
 	let hasMore = true
 	let blockContent = []
-	let startCursor = ""
 
 	while (hasMore) {
 		try {
@@ -19,7 +18,6 @@ exports.getBlocks = async (notionClient, blockId, reporter) => {
 			}
 
 			blockContent = blockContent.concat(result.results)
-			startCursor = result.next_cursor
 			hasMore = result.has_more
 		} catch (e) {
 			reporter.panic(errorMessage)

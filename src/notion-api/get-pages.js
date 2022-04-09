@@ -16,7 +16,9 @@ exports.getPages = async (notionClient, databaseId, reporter) => {
 			for (let page of result.results) {
 				pages.push(page)
 			}
+
 		} catch (e) {
+			reporter.panic(e.message)
 			reporter.panic(errorMessage)
 		}
 	}
