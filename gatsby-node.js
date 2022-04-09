@@ -26,7 +26,7 @@ exports.sourceNodes = async (
 ) => {
 	const pages = await getPages(notionClient, databaseId, reporter)
 	
-	for(let page in pages) {
+	for(let page of pages) {
 	  const pageContent = await n2m.pageToMarkdown(page.id)
 		page.markdown = n2m.toMarkdownString(pageContent) 
 	}
