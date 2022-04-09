@@ -7,24 +7,36 @@ const { getNotionPageTitle } = require("./src/transformers/get-page-title")
 const { getNotionPageCover } = require("./src/transformers/get-page-cover")
 
 const NOTION_NODE_TYPE = "Notion"
+let n2m
+let notionClient
+
+exports.onPluginInit = ({ actions }, { token }) => {
+	notionClient = new Client({
+		auth: token,
+	})
+
+	n2m = new NotionToMarkdown({ notionClient })
+	
+	console.log("Loaded gatsby-source-notion-api")
+}
 
 exports.sourceNodes = async (
 	{ actions, createContentDigest, createNodeId, reporter },
 	{ token, databaseId, propsToFrontmatter = true, lowerTitleLevel = true },
 ) => {
-	const notion = new Client({
-		auth: token,
-	})
-	const n2m = new NotionToMarkdown({ notionClient: notion })
-
-	const pages = await getPages({ token, databaseId }, reporter)
+	const pages = await getPages(notionClient, databaseId, reporter)
+	
+	for(let page in pages) {
+	  const pageContent = await n2m.pageToMarkdown(page.id)
+		page.markdown = n2m.toMarkdownString(pageContent) 
+	}
 
 	pages.forEach(async (page) => {
 		const title = getNotionPageTitle(page)
 		const properties = getNotionPageProperties(page)
 		const cover = getNotionPageCover(page)
-		const mdblocks = await n2m.pageToMarkdown(page.id)
-		let markdown = n2m.toMarkdownString(mdblocks)
+
+		let markdown = page.markdown;
 
 		if (propsToFrontmatter) {
 			const frontmatter = Object.keys(properties).reduce(

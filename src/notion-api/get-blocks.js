@@ -1,33 +1,20 @@
-const fetch = require("node-fetch")
 const { errorMessage } = require("../error-message")
 
-exports.getBlocks = async ({ id, notionVersion, token }, reporter) => {
+exports.getBlocks = async (notionClient, blockId, reporter) => {
 	let hasMore = true
 	let blockContent = []
 	let startCursor = ""
 
 	while (hasMore) {
-		let url = `https://api.notion.com/v1/blocks/${id}/children`
-
-		if (startCursor) {
-			url += `?start_cursor=${startCursor}`
-		}
-
 		try {
-			const result = await fetch(url, {
-				headers: {
-					"Content-Type": "application/json",
-					"Notion-Version": notionVersion,
-					Authorization: `Bearer ${token}`,
-				},
-			}).then((res) => res.json())
+			const result = await notionClient.blocks.children.list({
+				block_id: blockId,
+				page_size: 50,
+			})
 
 			for (let childBlock of result.results) {
 				if (childBlock.has_children) {
-					childBlock.children = await this.getBlocks(
-						{ id: childBlock.id, notionVersion, token },
-						reporter,
-					)
+					childBlock.children = await this.getBlocks(notionClient, childBlock.id, reporter);
 				}
 			}
 
