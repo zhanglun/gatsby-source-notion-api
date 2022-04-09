@@ -1,5 +1,4 @@
 const { errorMessage } = require("../error-message")
-const { getBlocks } = require("./get-blocks")
 
 exports.getPages = async (notionClient, databaseId, reporter) => {
 	let hasMore = true
@@ -15,8 +14,6 @@ exports.getPages = async (notionClient, databaseId, reporter) => {
 			hasMore = result.has_more
 
 			for (let page of result.results) {
-				page.children = await getBlocks(notionClient, page.id, reporter)
-
 				pages.push(page)
 			}
 		} catch (e) {

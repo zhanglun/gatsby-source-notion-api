@@ -31,6 +31,7 @@ exports.sourceNodes = async (
 		page.markdown = n2m.toMarkdownString(pageContent) 
 	}
 
+
 	pages.forEach(async (page) => {
 		const title = getNotionPageTitle(page)
 		const properties = getNotionPageProperties(page)
@@ -42,7 +43,7 @@ exports.sourceNodes = async (
 			const frontmatter = Object.keys(properties).reduce(
 				(acc, key) => ({
 					...acc,
-					[key]: properties[key].value.remoteImage || properties[key].value,
+					[key]: properties[key]?.value?.remoteImage || properties[key].value,
 				}),
 				{ title },
 			)
