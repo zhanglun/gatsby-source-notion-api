@@ -8,7 +8,7 @@ exports.getBlocks = async (notionClient, blockId, reporter) => {
 		try {
 			const result = await notionClient.blocks.children.list({
 				block_id: blockId,
-				page_size: 50,
+				page_size: 100,
 			})
 
 			for (let childBlock of result.results) {
